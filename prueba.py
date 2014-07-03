@@ -4,5 +4,5 @@
 from clases import Tumblr
 
 t = Tumblr('moderniscima.tumblr.com')
-
+t.buscarPosts()
 
