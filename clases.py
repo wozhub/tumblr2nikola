@@ -34,7 +34,7 @@ class Tumblr:
 
             posts = 0
             for div in soup.findAll('div'):
-                if div.has_key('class'):
+                if div.has_attr('class'):
                     if 'post' in div['class']:
                         posts = 1
                         post = Post(
@@ -67,6 +67,8 @@ class Post:
         self.url = post_url
         self.post_type = post_type
         self.pool = http_pool
+        self.contenido = ""
+        self.adjunto = ""
 
     def expandir(self):
         http = self.pool.request('GET', self.url)
@@ -78,9 +80,19 @@ class Post:
 
         div = soup.find('div', {'id': self.id})
         contenido = div.find('div', {'class': 'content'})
-        #print "\n\n\n\n", h.handle(contenido.prettify())
+
+        self.contenido = h.handle(contenido.prettify())
 
         if self.post_type == "photo":
             url = div.find('a', {'class': 'zoom'})['href']
             archivo = url.split('/')[-1]
+            descargaDesdeURLaArchivo(url, archivo)
+            self.adjunto = archivo
+
+        elif self.post_type == "audio":
+            link = div.find('iframe', {'class': 'tumblr_audio_player'})['src']
+            link = link.split('?', 1)[0].split('/')[-1]
+            archivo = "%s.mp3" % self.id
+            url = "https://a.tumblr.com/%so1.mp3" % link
+            self.adjunto = archivo
             descargaDesdeURLaArchivo(url, archivo)
