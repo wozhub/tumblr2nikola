@@ -62,7 +62,7 @@ class Tumblr:
 
 class Post:
     def __init__(self, post_id, post_url, post_type, http_pool):
-        print post_id, post_url, post_type
+        #print post_id, post_url, post_type
         self.id = post_id
         self.url = post_url
         self.post_type = post_type
@@ -84,15 +84,20 @@ class Post:
         self.contenido = h.handle(contenido.prettify())
 
         if self.post_type == "photo":
-            url = div.find('a', {'class': 'zoom'})['href']
-            archivo = url.split('/')[-1]
-            descargaDesdeURLaArchivo(url, archivo)
-            self.adjunto = archivo
+            try:
+                url = div.find('a', {'class': 'zoom'})['href']
+                archivo = url.split('/')[-1]
+                descargaDesdeURLaArchivo(url, 'files/' + archivo)
+                self.adjunto = archivo
+                self.contenido = contenido.find('div', {'class': 'caption'}).text
+
+            except:
+                print self.url
 
         elif self.post_type == "audio":
             link = div.find('iframe', {'class': 'tumblr_audio_player'})['src']
             link = link.split('?', 1)[0].split('/')[-1]
             archivo = "%s.mp3" % self.id
             url = "https://a.tumblr.com/%so1.mp3" % link
-            self.adjunto = archivo
             descargaDesdeURLaArchivo(url, archivo)
+            self.adjunto = archivo
